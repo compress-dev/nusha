@@ -23,6 +23,6 @@
   },
   "homepage": "https://github.com/mr-exception/nusha#readme",
   "dependencies": {
-    "node-telegram-bot-api": "^0.29.0"
+    "request": "^2.83.0"
   }
 }
