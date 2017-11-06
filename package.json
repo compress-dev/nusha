@@ -1,0 +1,28 @@
+{
+  "name": "nusha",
+  "version": "1.0.0",
+  "description": "telegram game bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mr-exception/nusha.git"
+  },
+  "keywords": [
+    "bot",
+    "telegram",
+    "api",
+    "node"
+  ],
+  "author": "mr-exception",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mr-exception/nusha/issues"
+  },
+  "homepage": "https://github.com/mr-exception/nusha#readme",
+  "dependencies": {
+    "node-telegram-bot-api": "^0.29.0"
+  }
+}
