@@ -9,6 +9,21 @@ telegram.on_text('/echo', (args, name, username, message) => {
   console.log(`echo: ${args}`)
 })
 
-telegram.on_text('/repeat', (args, name, username, message) => {
-  console.log(`repeat#${name}: ${args}`)
+telegram.on_text('/repeat', (args, name, username, chat_id, message) => {
+  console.log(`repeat#${username}(${chat_id}): ${args}`)
+  telegram.send_text_message(chat_id, args.join(telegram.text_messages_splitter), {}, () => {
+
+  })
+})
+
+telegram.on_any_text((text, name, username, chat_id, message) => {
+  telegram.send_text_message(chat_id, `any text ${text}`, {}, () => {
+    console.log('sent: ' + text)
+  })
+})
+
+telegram.on_any_callback((data, name, username, chat_id, message) => {
+  telegram.send_text_message(chat_id, data, {}, () => {
+    
+  })
 })
