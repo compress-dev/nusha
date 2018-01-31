@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/mr-exception/nusha#readme",
   "dependencies": {
+    "mongoose": "^5.0.2",
     "request": "^2.83.0"
   }
 }

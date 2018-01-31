@@ -1,8 +1,7 @@
-const token = '460908339:AAGMTxi85BuwbHjZejRm7CyVoXFDRTocRtk'
-
+const config = require('./config.js');
 
 const telegram = require('./libs/telegram.js')
-telegram.set_token(token)
+telegram.set_token(config.token)
 telegram.start()
 
 telegram.on_text('/echo', (args, name, username, message) => {
