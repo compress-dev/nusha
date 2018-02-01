@@ -14,7 +14,7 @@ const Member = mongoose.model('Member',
     },
     status: {
       type: Number,
-      default: 0,
+      default: 1,
       enum: [
         1, // started, free
         2, // block
