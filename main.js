@@ -2,10 +2,7 @@ const config = require('./config.js')
 const express = require('express')
 const models = require('./models')
 const is_url = require('is-url')
-const is_json = require('is-json');
-const url_schema = require('./json-schemas.js')
-const request = require("request")
-
+const activate = require('./activate.js')
 const app = express()
 const telegram = require('./libs/telegram.js')
 telegram.set_token(config.token)
@@ -37,7 +34,7 @@ telegram.on_any_text((text, name, username, chat_id, message) => {
         switch (member.status) {
           case 4:
             /* sent the code activity url */
-            activate_code_activity_url(text, () => {
+            activate.code_activity_url(text, () => {
               member.links.code_activity = text
               member.status = 5
               member.save()
@@ -52,7 +49,7 @@ telegram.on_any_text((text, name, username, chat_id, message) => {
             break;
           case 5:
             /* sent the code activity url */
-            activate_language_url(text, () => {
+            activate.language_url(text, () => {
               member.links.languages = text
               member.status = 6
               member.save()
@@ -67,7 +64,7 @@ telegram.on_any_text((text, name, username, chat_id, message) => {
           break;
         case 6:
           /* sent the code activity url */
-          activate_editor_url(text, () => {
+          activate.editor_url(text, () => {
             member.links.editors = text
             member.status = 7
             member.save()
@@ -82,7 +79,7 @@ telegram.on_any_text((text, name, username, chat_id, message) => {
           break;
         case 7:
           /* sent the code activity url */
-          activate_os_url(text, () => {
+          activate.os_url(text, () => {
             member.links.os = text
             member.status = 1
             member.save()
@@ -122,6 +119,12 @@ telegram.on_any_callback((data, name, username, chat_id, message) => {
   }
 })
 
+/**
+ * user started to register in this step
+ * we have to send a message to ensure user whom is registered in wakatime.com
+ * user have to login to account
+ * @param {*} chat_id 
+ */
 var start_registering = (chat_id) => {
   models.Member.findOne({_id: chat_id, status: 1}, (err, member) => {
     if(member){
@@ -146,7 +149,12 @@ login to your wakatime account
     }
   })
 }
-
+/**
+ * now we know user is registered in wakatime.com
+ * user have to generate the links of wakatime
+ * first link is the code activity link
+ * @param {*} chat_id 
+ */
 var register_code_activity = (chat_id) => {
   models.Member.findOne({_id: chat_id, status: 3}, (err, member) => {
     if(member){
@@ -165,78 +173,4 @@ exactly the link! I have to validate the link
     }
   })
 }
-// https://wakatime.com/share/@mrException/645c9021-13ae-42ba-840f-dfc1b38cb132.json
-var activate_code_activity_url = (url, on_success, on_fail) => {
-  var jar = request.jar()
-  var options = { method: 'GET',
-    url,
-    jar: 'JAR' }
-  request(options, function (error, response, body) {
-    if(error || !is_json(body))
-      on_fail()
-    else{
-      var result = JSON.parse(body)
-      if(url_schema.check_code_activity(result))
-        on_success()
-      else
-        on_fail()
-    }
-  });
-}
 
-// https://wakatime.com/share/@mrException/82c3d824-c13d-4998-9fe8-c819466be05e.json
-var activate_language_url = (url, on_success, on_fail) => {
-  var jar = request.jar()
-  var options = { method: 'GET',
-    url,
-    jar: 'JAR' }
-  request(options, function (error, response, body) {
-    if(error || !is_json(body))
-      on_fail()
-    else{
-      var result = JSON.parse(body)
-      if(url_schema.check_language(result))
-        on_success()
-      else
-        on_fail()
-    }
-  });
-}
-
-// https://wakatime.com/share/@mrException/541f62e9-eb5b-461e-a45f-82b50648c580.json
-var activate_editor_url = (url, on_success, on_fail) => {
-  var jar = request.jar()
-  var options = { method: 'GET',
-    url,
-    jar: 'JAR' }
-  request(options, function (error, response, body) {
-    if(error || !is_json(body))
-      on_fail()
-    else{
-      var result = JSON.parse(body)
-      if(url_schema.check_editor(result))
-        on_success()
-      else
-        on_fail()
-    }
-  });
-}
-
-// https://wakatime.com/share/@mrException/442ccd73-a09d-4238-9aeb-2855bf337cd0.json
-var activate_os_url = (url, on_success, on_fail) => {
-  var jar = request.jar()
-  var options = { method: 'GET',
-    url,
-    jar: 'JAR' }
-  request(options, function (error, response, body) {
-    if(error || !is_json(body))
-      on_fail()
-    else{
-      var result = JSON.parse(body)
-      if(url_schema.check_os(result))
-        on_success()
-      else
-        on_fail()
-    }
-  });
-}
