@@ -10,21 +10,26 @@ telegram.set_token(config.token)
 telegram.start()
 
 telegram.on_text('/start', (args, name, username, chat_id, message) => {
-  var member = models.Member({ _id: chat_id, name, username })
-  member.save()
-  
-  telegram.send_text_message(chat_id, wellcome_message_string,`
-  hi ${name}
-  do you wanna to conitnue the registering method?
-  okay! just grant me access to your account status, I have to get your tracks
-  `,{
-    "reply_markup":{
-      "inline_keyboard": [[{
-        "text": "start registration",
-        "callback_data": `_register_start`
-      }]]}
+  models.Member.findOne({_id: chat_id}, (err, member) => {
+    if(member){
+      console.log('user is logged in')
+    }else{
+      member = models.Member({ _id: chat_id, name, username })
+      member.save()
+      
+      telegram.send_text_message(chat_id,`
+      hi ${name}
+      do you wanna to conitnue the registering method?
+      okay! just grant me access to your account status, I have to get your tracks
+      `,{
+        "reply_markup":{
+          "inline_keyboard": [[{
+            "text": "start registration",
+            "callback_data": `_register_start`
+          }]]}
+      }, () => {})  
+    }
   })
-  messages.wellcome(chat_id, telegram)
 })
 
 telegram.on_any_text((text, name, username, chat_id, message) => {

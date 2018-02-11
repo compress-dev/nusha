@@ -11,6 +11,10 @@ var set_text_messages_splitter = (splitter) => {
   text_messages_splitter = splitter
 }
 
+var default_success_callback = () => {
+  console.log('done!')
+}
+
 var get_me = (success, fail) => {
   send_request('getMe', {}, (response) => {
     if(response.ok)
@@ -124,7 +128,7 @@ var got_callback_message = (message) => {
       )
   }
 }
-var send_text_message = (chat_id, text, options, callback) => {
+var send_text_message = (chat_id, text, options, callback = default_success_callback) => {
   send_request('sendMessage', Object.assign({chat_id, text}, options),
     (response) => {
       if(response.ok)
