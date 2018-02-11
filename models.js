@@ -30,5 +30,6 @@ const Member = mongoose.model('Member',
 );
 
 module.exports = {
-  Member
+  Member,
+  mongoose
 }

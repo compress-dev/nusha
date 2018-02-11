@@ -77,12 +77,18 @@ var knok_the_champion = (rank) => {
     var message = `
     aaaaaannnnd our champion is ${rank.name} by ${time_string(rank.score)}
     `
-    send_photo_to_channel(photo, message, () => {})
+    send_photo_to_channel(photo, message, () => {
+      console.log('finished...')
+      models.mongoose.connection.close()
+    })
   }, () => {
     var message = `
     aaaaaannnnd our champion is ${rank.name} by <i>${time_string(rank.score)}</i>
     `
-    send_message_to_channel(message, () => {})
+    send_message_to_channel(message, () => {
+      console.log('finished...')
+      models.mongoose.connection.close()
+    })
   })
 }
 
@@ -137,5 +143,4 @@ var get_last_profile_photo = (user_id, on_success, no_image) => {
         no_image()
     }
   });
-  
 }
