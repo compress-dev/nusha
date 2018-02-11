@@ -52,18 +52,90 @@ var list_completed = () => {
   ranks = ranks.sort((a, b) => {
     return b.score - a.score
   })
+  var date = new Date();
   // now ranks is a sorted list of members by it's code activity score
   var message = `
-Todays Ranking! (${Date()})
+Todays Ranking! (${date.getFullYear()}/${date.getMonth()}/${date.getDate()} - ${date.getHours()}:${date.getMinutes()})
 ---------------------------
 `
-  for(var i=0; i< Math.min(3, ranks.length); i++){
-    message += `${i}. **${ranks[i].name}** by __${time_string(ranks[i].score)}__
+  for(var i=1; i< Math.min(3, ranks.length); i++){
+    message += `${i}. <b>${ranks[i].name}</b> by <i>${time_string(ranks[i].score)}</i>
 `
   }
   for(var i=3; i< ranks.length; i++){
-    message += `${i}. ${ranks[i].name} by __${time_string(ranks[i].score)}__
+    message += `${i}. <b>${ranks[i].name}</b> by <i>${time_string(ranks[i].score)}</i>
 `
   }
-  console.log(message)
+  send_message_to_channel(message, () => {
+    console.log(`rankings sent`)
+    knok_the_champion(ranks[0])
+  })
+}
+
+var knok_the_champion = (rank) => {
+  get_last_profile_photo(rank._id, (photo) => {
+    var message = `
+    aaaaaannnnd our champion is ${rank.name} by ${time_string(rank.score)}
+    `
+    send_photo_to_channel(photo, message, () => {})
+  }, () => {
+    var message = `
+    aaaaaannnnd our champion is ${rank.name} by <i>${time_string(rank.score)}</i>
+    `
+    send_message_to_channel(message, () => {})
+  })
+}
+
+var send_message_to_channel = (text, on_success) => {
+  var request = require("request");
+  
+  var options = { method: 'GET',
+    url: 'https://api.telegram.org/bot544677252:AAEE6ZDRz2BeaGz6ik2LLYz4Nh20bjrXUcU/sendMessage',
+    headers: { 'content-type': 'application/json' },
+    body: 
+     { chat_id: '@lash_coders',
+       text,
+       parse_mode: 'HTML' },
+    json: true };
+  
+  request(options, function (error, response, body) {
+    if (error) throw new Error(error);
+    on_success()
+  });  
+}
+
+var send_photo_to_channel = (photo, caption, on_success) => {
+  var request = require("request");  
+  var options = { method: 'GET',
+    url: 'https://api.telegram.org/bot544677252:AAEE6ZDRz2BeaGz6ik2LLYz4Nh20bjrXUcU/sendPhoto',
+    headers: { 'content-type': 'application/json' },
+    body: 
+     { chat_id: '@lash_coders',
+       photo, caption },
+    json: true };
+  
+  request(options, function (error, response, body) {
+    if (error) throw new Error(error);
+    on_success()
+  });
+}
+
+var get_last_profile_photo = (user_id, on_success, no_image) => {
+  var request = require("request");
+  var options = { method: 'GET',
+    url: 'https://api.telegram.org/bot544677252:AAEE6ZDRz2BeaGz6ik2LLYz4Nh20bjrXUcU/getUserProfilePhotos',
+    headers: { 'content-type': 'application/json' },
+    body: { user_id, offset: '0', limit: '1' },
+    json: true };
+  
+  request(options, function (error, response, body) {
+    if (error) throw new Error(error);
+    if(body.ok){
+      if(body.result.total_count > 0){
+        on_success(body.result.photos[0][1].file_id)
+      }else
+        no_image()
+    }
+  });
+  
 }
