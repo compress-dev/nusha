@@ -62,4 +62,5 @@ Todays Ranking! (${date.getFullYear()}/${date.getMonth()}/${date.getDate()} - ${
     message += `${i}. <b>${ranks[i].name}</b> by <i>${time_string(ranks[i].score)}</i>
 `
   }
+  console.log(message)
 }
